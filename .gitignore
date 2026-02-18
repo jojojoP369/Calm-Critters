@@ -1,0 +1,14 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Plan/session files (optional, remove if you want these tracked)
+PLAN.md
+SESSION-STATE.md

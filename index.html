@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Calm Critters - Meditation for Kids</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --sky: #89CFF0; --lavender: #C3B1E1; --mint: #98FB98;
+    --peach: #FFDAB9; --sunshine: #FDFD96; --coral: #FF7F7F;
+    --text: #4A4A6A;
+    --bg-gradient: linear-gradient(135deg, #89CFF0 0%, #C3B1E1 50%, #FFDAB9 100%);
+  }
+  body {
+    font-family: 'Nunito', sans-serif; background: var(--bg-gradient);
+    min-height: 100vh; color: var(--text); overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .screen {
+    display: none; flex-direction: column; align-items: center;
+    min-height: 100vh; padding: 24px 16px 40px; animation: fadeIn 0.4s ease;
+  }
+  .screen.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .mascot-container { position: relative; margin: 16px 0; }
+  .mascot { width: 160px; height: 160px; animation: float 3s ease-in-out infinite; }
+  .mascot-small { width: 100px; height: 100px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  @keyframes wiggle { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
+  @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  @keyframes celebrate { 0% { transform: scale(1) rotate(0deg); } 25% { transform: scale(1.2) rotate(-10deg); } 50% { transform: scale(1.3) rotate(0deg); } 75% { transform: scale(1.2) rotate(10deg); } 100% { transform: scale(1) rotate(0deg); } }
+  .mascot-breathing { animation: breatheMascot 6s ease-in-out infinite; }
+  @keyframes breatheMascot { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.15); } 60% { transform: scale(1.15); } }
+
+  .app-title { font-size: 2.2rem; font-weight: 800; color: #fff; text-shadow: 2px 2px 8px rgba(100,80,160,0.3); margin-bottom: 4px; text-align: center; }
+  .app-subtitle { font-size: 1rem; color: rgba(255,255,255,0.85); margin-bottom: 24px; text-align: center; }
+
+  .activity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 360px; margin-top: 8px; }
+  .activity-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; padding: 24px 16px; border: none; border-radius: 24px;
+    font-family: 'Nunito', sans-serif; font-size: 1.05rem; font-weight: 700;
+    color: var(--text); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); min-height: 120px; user-select: none;
+  }
+  .activity-btn:active { transform: scale(0.95); }
+  .activity-btn:hover { transform: scale(1.03); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+  .activity-btn .icon { font-size: 2.5rem; }
+  .btn-breathe { background: linear-gradient(135deg, #89CFF0, #B0E0FF); }
+  .btn-meditate { background: linear-gradient(135deg, #C3B1E1, #D8C8F0); }
+  .btn-feelings { background: linear-gradient(135deg, #FFDAB9, #FFE8D0); }
+  .btn-rewards { background: linear-gradient(135deg, #FDFD96, #FFFCB0); }
+
+  .back-btn {
+    position: fixed; top: 16px; left: 16px; width: 52px; height: 52px;
+    border-radius: 50%; border: none; background: rgba(255,255,255,0.85);
+    font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: transform 0.2s; z-index: 100;
+  }
+  .back-btn:active { transform: scale(0.9); }
+  .screen-title { font-size: 1.8rem; font-weight: 800; color: #fff; text-shadow: 2px 2px 8px rgba(100,80,160,0.3); margin: 16px 0 8px; text-align: center; }
+
+  .big-btn {
+    padding: 18px 48px; border: none; border-radius: 50px;
+    font-family: 'Nunito', sans-serif; font-size: 1.2rem; font-weight: 700;
+    color: #fff; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15); min-height: 64px; user-select: none;
+  }
+  .big-btn:active { transform: scale(0.95); }
+  .big-btn-blue { background: linear-gradient(135deg, #5B9BD5, #89CFF0); }
+  .big-btn-green { background: linear-gradient(135deg, #66BB6A, #98FB98); color: var(--text); }
+  .big-btn-coral { background: linear-gradient(135deg, #E57373, #FF7F7F); }
+
+  /* BREATHING */
+  .breathing-area { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 24px; width: 100%; }
+  .breathing-circle-container { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; }
+  .breathing-circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(137,207,240,0.6), rgba(195,177,225,0.8));
+    transition: width 0.3s ease, height 0.3s ease;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 40px rgba(137,207,240,0.4);
+  }
+  .breathing-circle.inhale { width: 200px; height: 200px; transition: width 4s ease-in-out, height 4s ease-in-out; }
+  .breathing-circle.hold { width: 200px; height: 200px; }
+  .breathing-circle.exhale { width: 120px; height: 120px; transition: width 4s ease-in-out, height 4s ease-in-out; }
+  .breathing-circle-inner { font-size: 3rem; }
+  .breathing-label { font-size: 1.6rem; font-weight: 700; color: #fff; text-shadow: 1px 1px 6px rgba(0,0,0,0.15); min-height: 48px; display: flex; align-items: center; gap: 10px; }
+  .breathing-counter { font-size: 1rem; color: rgba(255,255,255,0.8); margin-top: 4px; }
+
+  /* FEELINGS */
+  .feelings-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; max-width: 360px; width: 100%; margin-top: 16px; }
+  .feeling-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 20px 12px; border: 4px solid transparent; border-radius: 24px;
+    background: rgba(255,255,255,0.85); cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700;
+    color: var(--text); box-shadow: 0 3px 12px rgba(0,0,0,0.08); min-height: 100px;
+  }
+  .feeling-btn:active { transform: scale(0.93); }
+  .feeling-btn:hover { transform: scale(1.05); }
+  .feeling-btn.selected { border-color: var(--lavender); box-shadow: 0 4px 20px rgba(195,177,225,0.4); }
+  .feeling-btn .icon { font-size: 2.5rem; }
+  .feeling-response { margin-top: 20px; padding: 20px; border-radius: 20px; background: rgba(255,255,255,0.9); max-width: 320px; text-align: center; font-size: 1.1rem; font-weight: 600; box-shadow: 0 3px 12px rgba(0,0,0,0.08); animation: fadeIn 0.4s ease; }
+
+  /* MEDITATION LIST */
+  .meditation-list { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 400px; margin-top: 16px; }
+  .meditation-card {
+    display: flex; align-items: center; gap: 16px; padding: 20px;
+    border: none; border-radius: 24px; background: rgba(255,255,255,0.88);
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Nunito', sans-serif; box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    text-align: left; width: 100%; min-height: 80px;
+  }
+  .meditation-card:active { transform: scale(0.97); }
+  .meditation-card:hover { transform: scale(1.02); box-shadow: 0 5px 18px rgba(0,0,0,0.12); }
+  .meditation-card .icon { font-size: 2.8rem; flex-shrink: 0; }
+  .meditation-card-info { flex: 1; }
+  .meditation-card-title { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+  .meditation-card-desc { font-size: 0.85rem; color: #8888AA; margin-top: 2px; }
+  .meditation-card-duration { font-size: 0.8rem; font-weight: 700; background: var(--lavender); color: #fff; padding: 4px 12px; border-radius: 20px; flex-shrink: 0; }
+
+  /* MEDITATION PLAYER */
+  .player-area { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 12px; width: 100%; position: relative; }
+  .player-canvas-wrap {
+    position: relative; width: 100%; max-width: 420px; aspect-ratio: 4/3;
+    border-radius: 24px; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.12);
+  }
+  .player-canvas-wrap canvas { display: block; width: 100%; height: 100%; border-radius: 24px; }
+  .player-subtitle-bar {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.88); border-radius: 16px; padding: 10px 20px;
+    color: var(--text); font-size: 1rem; font-weight: 700; max-width: 85%;
+    text-align: center; backdrop-filter: blur(6px); pointer-events: none;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1); line-height: 1.4;
+    transition: opacity 0.3s;
+  }
+  .player-timer { font-size: 2.5rem; font-weight: 800; color: #fff; text-shadow: 2px 2px 8px rgba(0,0,0,0.15); }
+  .player-title { font-size: 1.3rem; font-weight: 700; color: #fff; text-shadow: 1px 1px 4px rgba(0,0,0,0.1); }
+  .player-controls { display: flex; gap: 16px; margin-top: 4px; }
+  .volume-control { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 8px 16px; }
+  .volume-control label { color: #fff; font-size: 1.2rem; }
+  .volume-control input[type="range"] { width: 120px; accent-color: #fff; }
+  .voice-loading { color: rgba(255,255,255,0.7); font-size: 0.85rem; min-height: 20px; }
+
+  /* REWARDS */
+  .rewards-area { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; max-width: 400px; }
+  .streak-display { background: rgba(255,255,255,0.9); border-radius: 24px; padding: 24px 32px; text-align: center; box-shadow: 0 3px 12px rgba(0,0,0,0.08); width: 100%; }
+  .streak-number { font-size: 3.5rem; font-weight: 800; color: var(--coral); }
+  .streak-label { font-size: 1.1rem; font-weight: 700; color: #8888AA; }
+  .stars-display { background: rgba(255,255,255,0.9); border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 3px 12px rgba(0,0,0,0.08); width: 100%; }
+  .stars-count { font-size: 3.5rem; font-weight: 800; color: #F0B800; }
+  .stars-visual { font-size: 2rem; margin-top: 8px; line-height: 1.8; word-spacing: 4px; }
+  .recent-feelings { background: rgba(255,255,255,0.9); border-radius: 24px; padding: 24px; text-align: center; box-shadow: 0 3px 12px rgba(0,0,0,0.08); width: 100%; }
+  .recent-feelings-title { font-size: 1.1rem; font-weight: 700; color: #8888AA; margin-bottom: 12px; }
+  .recent-feelings-list { font-size: 2rem; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+
+  /* CELEBRATION */
+  .celebration-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.3); flex-direction: column; align-items: center; justify-content: center; gap: 16px; animation: fadeIn 0.3s ease; }
+  .celebration-overlay.active { display: flex; }
+  .celebration-box { background: #fff; border-radius: 32px; padding: 40px 32px; text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.2); max-width: 320px; animation: celebrate 0.6s ease; }
+  .celebration-star { font-size: 4rem; margin-bottom: 8px; }
+  .celebration-text { font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .celebration-sub { font-size: 1rem; color: #8888AA; margin-bottom: 20px; }
+  .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 1001; overflow: hidden; }
+  .confetti-piece { position: absolute; width: 12px; height: 12px; border-radius: 3px; top: -20px; animation: confettiFall linear forwards; }
+  @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+  @media (min-width: 500px) {
+    .screen { padding: 32px 24px 48px; }
+    .mascot { width: 200px; height: 200px; }
+    .app-title { font-size: 2.8rem; }
+    .activity-grid { max-width: 420px; gap: 20px; }
+    .activity-btn { padding: 28px 20px; min-height: 140px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home-screen" class="screen active">
+  <div class="mascot-container">
+    <svg class="mascot" viewBox="0 0 200 200"><circle cx="100" cy="115" r="65" fill="#D4A574"/><circle cx="55" cy="55" r="25" fill="#D4A574"/><circle cx="145" cy="55" r="25" fill="#D4A574"/><circle cx="55" cy="55" r="15" fill="#C49264"/><circle cx="145" cy="55" r="15" fill="#C49264"/><circle cx="100" cy="110" r="55" fill="#E8C9A0"/><ellipse cx="78" cy="100" rx="7" ry="8" fill="#4A4A6A"/><ellipse cx="122" cy="100" rx="7" ry="8" fill="#4A4A6A"/><circle cx="75" cy="97" r="3" fill="#fff"/><circle cx="119" cy="97" r="3" fill="#fff"/><ellipse cx="100" cy="118" rx="10" ry="7" fill="#C49264"/><path d="M88 128 Q100 140 112 128" fill="none" stroke="#4A4A6A" stroke-width="2.5" stroke-linecap="round"/><circle cx="68" cy="118" r="10" fill="rgba(255,150,150,0.35)"/><circle cx="132" cy="118" r="10" fill="rgba(255,150,150,0.35)"/></svg>
+  </div>
+  <h1 class="app-title">Calm Critters</h1>
+  <p class="app-subtitle">Let's feel calm and happy!</p>
+  <div class="activity-grid">
+    <button class="activity-btn btn-breathe" onclick="showScreen('breathing')"><span class="icon">🌬️</span> Breathe</button>
+    <button class="activity-btn btn-meditate" onclick="showScreen('meditate')"><span class="icon">🧘</span> Meditate</button>
+    <button class="activity-btn btn-feelings" onclick="showScreen('feelings')"><span class="icon">💛</span> Feelings</button>
+    <button class="activity-btn btn-rewards" onclick="showScreen('rewards')"><span class="icon">⭐</span> Rewards</button>
+  </div>
+</div>
+
+<!-- BREATHING -->
+<div id="breathing-screen" class="screen">
+  <button class="back-btn" onclick="showScreen('home')">⬅️</button>
+  <h2 class="screen-title">Breathe with Bear</h2>
+  <div class="breathing-area">
+    <svg class="mascot-small mascot-breathing" viewBox="0 0 200 200"><circle cx="100" cy="115" r="65" fill="#D4A574"/><circle cx="55" cy="55" r="25" fill="#D4A574"/><circle cx="145" cy="55" r="25" fill="#D4A574"/><circle cx="55" cy="55" r="15" fill="#C49264"/><circle cx="145" cy="55" r="15" fill="#C49264"/><circle cx="100" cy="110" r="55" fill="#E8C9A0"/><ellipse cx="78" cy="100" rx="7" ry="8" fill="#4A4A6A"/><ellipse cx="122" cy="100" rx="7" ry="8" fill="#4A4A6A"/><circle cx="75" cy="97" r="3" fill="#fff"/><circle cx="119" cy="97" r="3" fill="#fff"/><ellipse cx="100" cy="118" rx="10" ry="7" fill="#C49264"/><ellipse cx="100" cy="132" rx="7" ry="5" fill="#C49264" stroke="#4A4A6A" stroke-width="1.5"/><circle cx="68" cy="118" r="10" fill="rgba(255,150,150,0.35)"/><circle cx="132" cy="118" r="10" fill="rgba(255,150,150,0.35)"/></svg>
+    <div class="breathing-circle-container"><div id="breathing-circle" class="breathing-circle"><span class="breathing-circle-inner">🌸</span></div></div>
+    <div id="breathing-label" class="breathing-label">Tap Start to begin!</div>
+    <div id="breathing-counter" class="breathing-counter"></div>
+    <button id="breathing-start-btn" class="big-btn big-btn-blue" onclick="toggleBreathing()">▶️ Start</button>
+  </div>
+</div>
+
+<!-- FEELINGS -->
+<div id="feelings-screen" class="screen">
+  <button class="back-btn" onclick="showScreen('home')">⬅️</button>
+  <h2 class="screen-title">How Do You Feel?</h2>
+  <svg class="mascot-small" viewBox="0 0 200 200" style="animation: wiggle 2s ease-in-out infinite;"><circle cx="100" cy="115" r="65" fill="#D4A574"/><circle cx="55" cy="55" r="25" fill="#D4A574"/><circle cx="145" cy="55" r="25" fill="#D4A574"/><circle cx="55" cy="55" r="15" fill="#C49264"/><circle cx="145" cy="55" r="15" fill="#C49264"/><circle cx="100" cy="110" r="55" fill="#E8C9A0"/><ellipse cx="78" cy="100" rx="7" ry="8" fill="#4A4A6A"/><ellipse cx="122" cy="100" rx="7" ry="8" fill="#4A4A6A"/><circle cx="75" cy="97" r="3" fill="#fff"/><circle cx="119" cy="97" r="3" fill="#fff"/><ellipse cx="100" cy="118" rx="10" ry="7" fill="#C49264"/><path d="M88 128 Q100 140 112 128" fill="none" stroke="#4A4A6A" stroke-width="2.5" stroke-linecap="round"/><circle cx="68" cy="118" r="10" fill="rgba(255,150,150,0.35)"/><circle cx="132" cy="118" r="10" fill="rgba(255,150,150,0.35)"/></svg>
+  <div class="feelings-grid">
+    <button class="feeling-btn" onclick="selectFeeling('happy', this)"><span class="icon">😊</span> Happy</button>
+    <button class="feeling-btn" onclick="selectFeeling('calm', this)"><span class="icon">😌</span> Calm</button>
+    <button class="feeling-btn" onclick="selectFeeling('excited', this)"><span class="icon">🤩</span> Excited</button>
+    <button class="feeling-btn" onclick="selectFeeling('sad', this)"><span class="icon">😢</span> Sad</button>
+    <button class="feeling-btn" onclick="selectFeeling('angry', this)"><span class="icon">😠</span> Angry</button>
+    <button class="feeling-btn" onclick="selectFeeling('scared', this)"><span class="icon">😨</span> Scared</button>
+  </div>
+  <div id="feeling-response" class="feeling-response" style="display:none;"></div>
+</div>
+
+<!-- MEDITATE LIST -->
+<div id="meditate-screen" class="screen">
+  <button class="back-btn" onclick="showScreen('home')">⬅️</button>
+  <h2 class="screen-title">Pick a Journey</h2>
+  <div class="meditation-list">
+    <button class="meditation-card" onclick="startMeditation('ocean')"><span class="icon">🌊</span><div class="meditation-card-info"><div class="meditation-card-title">Ocean Waves</div><div class="meditation-card-desc">Watch the fishies swim by</div></div><span class="meditation-card-duration">2 min</span></button>
+    <button class="meditation-card" onclick="startMeditation('forest')"><span class="icon">🌲</span><div class="meditation-card-info"><div class="meditation-card-title">Magic Forest</div><div class="meditation-card-desc">See the butterflies dance</div></div><span class="meditation-card-duration">2 min</span></button>
+    <button class="meditation-card" onclick="startMeditation('space')"><span class="icon">🚀</span><div class="meditation-card-info"><div class="meditation-card-title">Space Adventure</div><div class="meditation-card-desc">Float among the stars</div></div><span class="meditation-card-duration">2 min</span></button>
+    <button class="meditation-card" onclick="startMeditation('rain')"><span class="icon">🌧️</span><div class="meditation-card-info"><div class="meditation-card-title">Rainy Day</div><div class="meditation-card-desc">Listen to the raindrops</div></div><span class="meditation-card-duration">2 min</span></button>
+  </div>
+</div>
+
+<!-- MEDITATION PLAYER -->
+<div id="player-screen" class="screen">
+  <button class="back-btn" onclick="stopMeditation()">⬅️</button>
+  <div class="player-area">
+    <div id="player-title" class="player-title">Ocean Waves</div>
+    <div class="player-canvas-wrap">
+      <canvas id="meditation-canvas"></canvas>
+      <div id="subtitle-bar" class="player-subtitle-bar">Get ready...</div>
+    </div>
+    <div id="player-timer" class="player-timer">2:00</div>
+    <div id="voice-status" class="voice-loading"></div>
+    <div class="volume-control">
+      <label>🔊</label>
+      <input type="range" id="volume-slider" min="0" max="100" value="60" oninput="setVolume(this.value)">
+    </div>
+    <div class="player-controls">
+      <button id="player-toggle-btn" class="big-btn big-btn-blue" onclick="toggleMeditationPlayback()">⏸️ Pause</button>
+      <button class="big-btn big-btn-coral" onclick="stopMeditation()">⏹️ Stop</button>
+    </div>
+  </div>
+</div>
+
+<!-- REWARDS -->
+<div id="rewards-screen" class="screen">
+  <button class="back-btn" onclick="showScreen('home')">⬅️</button>
+  <h2 class="screen-title">Your Rewards!</h2>
+  <svg class="mascot-small" viewBox="0 0 200 200" style="animation: bounce 1.5s ease-in-out infinite;"><circle cx="100" cy="115" r="65" fill="#D4A574"/><circle cx="55" cy="55" r="25" fill="#D4A574"/><circle cx="145" cy="55" r="25" fill="#D4A574"/><circle cx="55" cy="55" r="15" fill="#C49264"/><circle cx="145" cy="55" r="15" fill="#C49264"/><circle cx="100" cy="110" r="55" fill="#E8C9A0"/><path d="M70 98 Q78 92 86 98" fill="none" stroke="#4A4A6A" stroke-width="3" stroke-linecap="round"/><path d="M114 98 Q122 92 130 98" fill="none" stroke="#4A4A6A" stroke-width="3" stroke-linecap="round"/><ellipse cx="100" cy="118" rx="10" ry="7" fill="#C49264"/><path d="M82 128 Q100 148 118 128" fill="none" stroke="#4A4A6A" stroke-width="2.5" stroke-linecap="round"/><circle cx="68" cy="118" r="10" fill="rgba(255,150,150,0.35)"/><circle cx="132" cy="118" r="10" fill="rgba(255,150,150,0.35)"/></svg>
+  <div class="rewards-area">
+    <div class="streak-display"><div class="streak-label">🔥 Day Streak</div><div id="streak-number" class="streak-number">0</div></div>
+    <div class="stars-display"><div class="streak-label">⭐ Stars Collected</div><div id="stars-count" class="stars-count">0</div><div id="stars-visual" class="stars-visual"></div></div>
+    <div class="recent-feelings"><div class="recent-feelings-title">📝 Recent Feelings</div><div id="recent-feelings-list" class="recent-feelings-list">No feelings logged yet!</div></div>
+  </div>
+</div>
+
+<!-- CELEBRATION -->
+<div id="celebration-overlay" class="celebration-overlay">
+  <div class="celebration-box">
+    <div class="celebration-star">🌟</div>
+    <div id="celebration-text" class="celebration-text">Great Job!</div>
+    <div id="celebration-sub" class="celebration-sub">You earned a star!</div>
+    <button class="big-btn big-btn-green" onclick="closeCelebration()">Yay! ✨</button>
+  </div>
+</div>
+<div id="confetti-container" class="confetti-container"></div>
+
+<script>
+
+// ===== STATE =====
+const STORAGE_KEY = 'calm-critters-data';
+let state = loadState();
+function defaultState() { return { stars: 0, streak: 0, lastActiveDate: null, feelings: [] }; }
+function loadState() { try { const s = localStorage.getItem(STORAGE_KEY); if (s) return { ...defaultState(), ...JSON.parse(s) }; } catch(e){} return defaultState(); }
+function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){} }
+function addStar() { state.stars++; updateStreak(); saveState(); }
+function updateStreak() {
+  const today = new Date().toDateString();
+  if (state.lastActiveDate === today) return;
+  const y = new Date(); y.setDate(y.getDate()-1);
+  if (state.lastActiveDate === y.toDateString()) state.streak++;
+  else if (state.lastActiveDate !== today) state.streak = 1;
+  state.lastActiveDate = today;
+}
+
+// ===== AUDIO =====
+const SOUNDS = {
+  ocean: 'https://moodist.mvze.net/sounds/nature/waves.mp3',
+  forest: 'https://moodist.mvze.net/sounds/animals/birds.mp3',
+  space: 'https://moodist.mvze.net/sounds/animals/whale.mp3',
+  rain: 'https://moodist.mvze.net/sounds/rain/light-rain.mp3',
+};
+let currentAudio = null;
+let audioVolume = 0.6;
+
+function playAmbientSound(key) {
+  stopAmbientSound();
+  currentAudio = new Audio(SOUNDS[key]);
+  currentAudio.loop = true;
+  currentAudio.volume = audioVolume * 0.4; // lower so voice is clear
+  currentAudio.play().catch(()=>{});
+}
+function stopAmbientSound() { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime=0; currentAudio=null; } }
+window.setVolume = function(val) {
+  audioVolume = val / 100;
+  if (currentAudio) currentAudio.volume = audioVolume * 0.4;
+};
+
+function playBell() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator(); const gain = ctx.createGain();
+    osc.type = 'sine'; osc.frequency.value = 528;
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.5);
+    osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime+2.5);
+  } catch(e){}
+}
+
+// ===== GUIDED MEDITATION SCRIPTS =====
+// Each step: { text (spoken), subtitle (shown on screen), pause (seconds after speech) }
+const SCRIPTS = {
+  ocean: [
+    { text: "Guess what? We're going on an adventure under the sea! Are you ready? Yaaay!", subtitle: "Under the sea adventure! Yaaay!", pause: 2 },
+    { text: "Okay, let's sit down on our magic carpet. It's going to take us underwater! Sit down, sit down!", subtitle: "Sit on the magic carpet!", pause: 3 },
+    { text: "Woooosh! Here we go! Look, look! Can you see the fishies? They're waving at you! Wave back! Hi fishies!", subtitle: "Hi fishies! Wave hello!", pause: 3 },
+    { text: "Oh wow, a big friendly whale is swimming by! He wants to teach us how to blow bubbles. Let's try! Take a biiiig breath in through your nose, like you're smelling a yummy cookie.", subtitle: "Smell the yummy cookie! Big breath in!", pause: 2 },
+    { text: "Now blow out bubbles! Bloop, bloop, bloop! Blow, blow, blow!", subtitle: "Blow bubbles! Bloop bloop bloop!", pause: 3 },
+    { text: "Haha, the fishies are playing with your bubbles! They love it! Let's make more. Big sniff in!", subtitle: "The fishies love your bubbles!", pause: 2 },
+    { text: "And blow! Bigger bubbles this time! Bloooooop! Amazing!", subtitle: "Bigger bubbles! Bloooooop!", pause: 3 },
+    { text: "Now the friendly octopus says shhh, let's be very quiet and listen to the ocean. Can you close your eyes? What do you hear?", subtitle: "Shhh! Close your eyes and listen...", pause: 5 },
+    { text: "The water is so warm and cozy, like a big hug. You're floating like a little starfish. Arms out wide, just floating!", subtitle: "Float like a starfish!", pause: 4 },
+    { text: "One more magic bubble. Sniff in that ocean air!", subtitle: "One more magic bubble!", pause: 2 },
+    { text: "And blow the biggest bubble ever! Pop! Hahaha!", subtitle: "Biggest bubble ever! Pop!", pause: 2 },
+    { text: "Time to swim back! Open your eyes! You were the best little diver ever! High five! Give yourself a big squeezy hug!", subtitle: "You're the best diver! Big hug!", pause: 2 },
+  ],
+  forest: [
+    { text: "Pssst! I heard there's a secret party in the magic forest! Wanna go? Let's go!", subtitle: "Secret party in the magic forest!", pause: 2 },
+    { text: "Sit down like a little bunny in the soft grass. Tuck your paws in your lap! You're the cutest bunny ever!", subtitle: "Sit like a little bunny!", pause: 3 },
+    { text: "Oh look! The butterflies are dancing! They're doing a silly dance! Can you see them wiggle? Wiggle wiggle!", subtitle: "Silly butterfly dance! Wiggle!", pause: 3 },
+    { text: "A friendly little bird lands next to you and says, let's play a smelling game! Smell this flower! Sniff in through your nose, biiiig sniff!", subtitle: "Smell the flower! Biiiig sniff!", pause: 2 },
+    { text: "Mmmm, it smells like strawberries! Now blow on the flower and watch the petals fly! Whoooo!", subtitle: "Blow the petals! Whoooo!", pause: 3 },
+    { text: "Ooh, ooh, smell this one! It's a purple one! Big sniff!", subtitle: "Smell the purple flower!", pause: 2 },
+    { text: "This one smells like chocolate cake! Blow the petals! Pfffffft! Hehehe!", subtitle: "Chocolate cake! Blow! Hehehe!", pause: 3 },
+    { text: "Now the little squirrel says, let's play a squeezy game! Squeeze your hands super tight like you're holding acorns. Squeeeeeze!", subtitle: "Squeeze the acorns! Squeeeze!", pause: 2 },
+    { text: "And let go! Throw the acorns in the air! Wheee! Feel how wiggly and free your fingers are? Wiggle them!", subtitle: "Throw them! Wiggle your fingers!", pause: 3 },
+    { text: "Okay close your eyes. The sunshine is giving you a warm hug through the trees. So cozy. The birds are singing you a little song.", subtitle: "Warm sunshine hug... birds singing...", pause: 5 },
+    { text: "One more flower smell! Biiig sniff in! Mmmmm!", subtitle: "One more big sniff! Mmmmm!", pause: 2 },
+    { text: "And blow a kiss to the forest! Mwah! The forest says thank you!", subtitle: "Blow a kiss! Mwah!", pause: 2 },
+    { text: "Open your eyes! The butterflies are clapping for you! You did amazing! You're a forest superstar!", subtitle: "You're a forest superstar!", pause: 2 },
+  ],
+  space: [
+    { text: "Astronaut report to your rocket ship! We're going to space! Sit in your seat! Buckle up!", subtitle: "Buckle up, astronaut!", pause: 2 },
+    { text: "Let's count down together! Five, four, three, two, one, BLAST OFF! Whoooooosh!", subtitle: "5... 4... 3... 2... 1... BLAST OFF!", pause: 3 },
+    { text: "Wooow! Look out the window! Stars everywhere! They're sparkling like glitter! Can you see them?", subtitle: "Stars like glitter! So sparkly!", pause: 3 },
+    { text: "In space, we breathe special space air! Let's fill up our space helmet. Biiiig breath in!", subtitle: "Fill your space helmet! Breathe in!", pause: 2 },
+    { text: "Now breathe out super slow like you're fogging up the glass. Haaaaaah. Can you draw a smiley face in the fog?", subtitle: "Fog up the glass! Draw a smiley!", pause: 3 },
+    { text: "Haha, that's a great smiley! More space air! Biiiig sniff!", subtitle: "More space air! Big sniff!", pause: 2 },
+    { text: "And fog it up again! Haaaaah! Draw a star this time!", subtitle: "Draw a star in the fog!", pause: 3 },
+    { text: "Oh look! We're floating! In space everything floats! Let your arms float up slowly. Weeee! You're like a silly space jellyfish!", subtitle: "Float like a space jellyfish!", pause: 3 },
+    { text: "Now let them float back down. So gentle. So slow. Like a feather.", subtitle: "Float back down like a feather...", pause: 3 },
+    { text: "Close your eyes. The moon is singing you a lullaby. Mmmmm. It's so soft and sparkly up here.", subtitle: "The moon is singing to you...", pause: 5 },
+    { text: "One more big breath of magic space air. In!", subtitle: "One more magic space breath!", pause: 2 },
+    { text: "And out! Haaaaah! Perfect!", subtitle: "And out! Haaaaah! Perfect!", pause: 2 },
+    { text: "Time to fly home! Open your eyes! Wiggle your fingers like twinkling stars! You're the bravest astronaut in the whole galaxy!", subtitle: "Bravest astronaut in the galaxy!", pause: 2 },
+  ],
+  rain: [
+    { text: "Oh listen! Do you hear that? Pitter patter pitter patter! It's raining! Let's have a cozy rain party!", subtitle: "Pitter patter! Cozy rain party!", pause: 2 },
+    { text: "Let's sit down and get super cozy. Pretend you have the fluffiest blanket ever wrapped around you! Mmmm so warm!", subtitle: "Super fluffy blanket! So warm!", pause: 3 },
+    { text: "Put your hands on your tummy. Your tummy is like a little balloon! When you breathe in, the balloon gets bigger! Try it! Breathe in!", subtitle: "Tummy balloon getting bigger!", pause: 2 },
+    { text: "Now breathe out and the balloon gets tiny! Pssshhh! Hehe, do you feel it?", subtitle: "Balloon gets tiny! Pssshhh!", pause: 3 },
+    { text: "Let's do it with the rain! When the rain goes pitter, breathe in and your balloon gets big!", subtitle: "Pitter! Balloon gets big!", pause: 2 },
+    { text: "When the rain goes patter, breathe out and your balloon gets small! Patter, pssshh!", subtitle: "Patter! Balloon gets small!", pause: 3 },
+    { text: "Pitter, breathe in, big balloon!", subtitle: "Pitter! Big balloon!", pause: 2 },
+    { text: "Patter, breathe out, tiny balloon! Pssshh! You're so good at this!", subtitle: "Patter! Tiny balloon! So good!", pause: 3 },
+    { text: "Now close your eyes. Pretend a tiny friendly raindrop lands on your nose. Boop! Hehehe. And one on your cheek! Boop boop!", subtitle: "Raindrops on your nose! Boop!", pause: 4 },
+    { text: "The raindrops are tickling you! They're like tiny little kisses from the clouds. You're so cozy and safe.", subtitle: "Tiny kisses from the clouds!", pause: 4 },
+    { text: "One more tummy balloon! Big breath in, biiiiig balloon!", subtitle: "Biggest tummy balloon ever!", pause: 2 },
+    { text: "And let it all out. Ahhhh! That was the best balloon yet!", subtitle: "Ahhhh! Best balloon ever!", pause: 2 },
+    { text: "Open your eyes! The rain says thank you for playing! You're the coziest little raindrop catcher ever!", subtitle: "Best raindrop catcher ever!", pause: 2 },
+  ],
+};
+
+// ===== TTS ENGINE =====
+let ttsQueue = [];
+let ttsPlaying = false;
+let currentStepIndex = 0;
+let meditationStopped = false;
+
+// Preload voices — Chrome needs a moment to load them
+let voicesReady = false;
+let cachedVoices = [];
+function loadVoices() {
+  cachedVoices = speechSynthesis.getVoices();
+  if (cachedVoices.length > 0) voicesReady = true;
+}
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+async function speakStep(text) {
+  if (meditationStopped && breathingStopped) return;
+
+  // Wait for voices to load (up to 3 seconds)
+  if (!voicesReady) {
+    for (let i = 0; i < 30; i++) {
+      loadVoices();
+      if (voicesReady) break;
+      await new Promise(r => setTimeout(r, 100));
+    }
+  }
+
+  return new Promise((resolve) => {
+    if (meditationStopped && breathingStopped) { resolve(); return; }
+
+    // Cancel any ongoing speech first
+    speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.82;   // Slow and calm for kids
+    utterance.pitch = 1.05;  // Slightly higher, friendly tone
+    utterance.volume = 1.0;
+
+    // Pick the best available voice
+    const voices = speechSynthesis.getVoices();
+    const preferred = ['Samantha', 'Karen', 'Moira', 'Google US English', 'Tessa', 'Fiona', 'Alex'];
+    let selectedVoice = null;
+    for (const name of preferred) {
+      const match = voices.find(v => v.name.includes(name));
+      if (match) { selectedVoice = match; break; }
+    }
+    // If no preferred found, pick the first English voice
+    if (!selectedVoice) {
+      selectedVoice = voices.find(v => v.lang.startsWith('en'));
+    }
+    if (selectedVoice) utterance.voice = selectedVoice;
+
+    utterance.onend = () => resolve();
+    utterance.onerror = () => resolve();
+
+    // Chrome bug workaround: speech can stop after ~15 seconds
+    // Keep it alive by resuming periodically
+    let resumeTimer = setInterval(() => {
+      if (speechSynthesis.speaking && !speechSynthesis.paused) {
+        speechSynthesis.pause();
+        speechSynthesis.resume();
+      }
+    }, 10000);
+
+    utterance.onend = () => { clearInterval(resumeTimer); resolve(); };
+    utterance.onerror = () => { clearInterval(resumeTimer); resolve(); };
+
+    speechSynthesis.speak(utterance);
+  });
+}
+
+async function runGuidedMeditation(key) {
+  const steps = SCRIPTS[key];
+  meditationStopped = false;
+  const statusEl = document.getElementById('voice-status');
+  const subtitleEl = document.getElementById('subtitle-bar');
+
+  statusEl.textContent = 'Preparing gentle voice...';
+
+  for (let i = 0; i < steps.length; i++) {
+    if (meditationStopped) break;
+    // Wait while paused
+    while (meditationPaused && !meditationStopped) {
+      await new Promise(r => setTimeout(r, 200));
+    }
+    if (meditationStopped) break;
+
+    currentStepIndex = i;
+    subtitleEl.textContent = steps[i].subtitle;
+    subtitleEl.style.opacity = '1';
+    statusEl.textContent = `Step ${i+1} of ${steps.length}`;
+
+    await speakStep(steps[i].text);
+
+    if (meditationStopped) break;
+
+    // Pause after speech
+    const pauseMs = steps[i].pause * 1000;
+    const startTime = Date.now();
+    while (Date.now() - startTime < pauseMs && !meditationStopped) {
+      while (meditationPaused && !meditationStopped) {
+        await new Promise(r => setTimeout(r, 200));
+      }
+      await new Promise(r => setTimeout(r, 100));
+    }
+  }
+
+  if (!meditationStopped) {
+    statusEl.textContent = '';
+    subtitleEl.textContent = 'Namaste! 🙏';
+    playBell();
+    stopAmbientSound();
+    stopCanvasAnimation();
+    setTimeout(() => {
+      completeActivity('Meditation Done!', 'You are a meditation superstar!');
+      showScreen('meditate');
+    }, 3000);
+  }
+}
+
+// ===== NAVIGATION =====
+window.showScreen = function(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(name + '-screen').classList.add('active');
+  if (name === 'rewards') refreshRewards();
+  if (name !== 'breathing' && breathingRunning) stopBreathingExercise();
+  if (name !== 'player') { stopAmbientSound(); stopCanvasAnimation(); }
+};
+
+// ===== GUIDED BREATHING =====
+let breathingRunning = false;
+let breathingStopped = false;
+
+const BREATHING_INTRO = [
+  { text: "Hey! Bear wants to play a super fun game with you! It's called the balloon game! Wanna play?", subtitle: "The Balloon Game! Wanna play?" },
+  { text: "Okay! Sit down and pretend you're holding a tiny little balloon in your hands. Got it? What color is your balloon?", subtitle: "Hold your tiny balloon!" },
+];
+
+// Each cycle tells a mini story about blowing up the balloon
+const BREATHING_CYCLES_SCRIPTS = [
+  { // Cycle 1
+    phases: [
+      { text: "Let's blow up the balloon! First take a biiiig sniff of air through your nose! Sniiiiiff!", subtitle: "🌬️ Biiiig sniff! Sniiiiiff!", className: 'inhale', duration: 4000 },
+      { text: "Hold it, hold it! Don't let the air out yet!", subtitle: "✨ Hold it! Don't let go!", className: 'hold', duration: 2000 },
+      { text: "Now blow into your balloon! Whooooooo! Look, it's getting bigger!", subtitle: "🎈 Blow! It's getting bigger!", className: 'exhale', duration: 4000 },
+      { text: "Hehe! Nice! Look at your balloon! It's so pretty!", subtitle: "😊 So pretty!", className: '', duration: 2000 },
+    ],
+  },
+  { // Cycle 2
+    phases: [
+      { text: "Let's make it even bigger! Biiiig sniff through your nose, fill up your lungs!", subtitle: "🌬️ Bigger! Biiiig sniff!", className: 'inhale', duration: 4000 },
+      { text: "Hold that air! Shhh, don't let it escape!", subtitle: "✨ Shhh! Hold it in!", className: 'hold', duration: 2000 },
+      { text: "Blow blow blow! Whoooo! Wow, your balloon is getting SO big!", subtitle: "🎈 Whoooo! SO big!", className: 'exhale', duration: 4000 },
+      { text: "Amazing! That's the biggest balloon I've ever seen!", subtitle: "😲 The biggest balloon EVER!", className: '', duration: 2000 },
+    ],
+  },
+  { // Cycle 3
+    phases: [
+      { text: "One more time! The biggest sniff EVER! Ready? Sniiiiiiiff!", subtitle: "🌬️ Biggest sniff EVER!", className: 'inhale', duration: 4000 },
+      { text: "Hold it, hold it, hold it! Almost there!", subtitle: "✨ Hold hold hold!", className: 'hold', duration: 2000 },
+      { text: "And blow! Whoooooosh! Look at it go! It's HUGE! Hahaha!", subtitle: "🎈 WHOOOOSH! It's HUGE!", className: 'exhale', duration: 4000 },
+      { text: "Now let go of the balloon! Wheeeee! It's flying away! Bye bye balloon!", subtitle: "🎈 Bye bye balloon! Wheeeee!", className: '', duration: 2000 },
+    ],
+  },
+];
+
+const BREATHING_OUTRO = [
+  { text: "Hahaha! Did you see your balloon fly away? That was so silly! You did such a great job!", subtitle: "Hahaha! So silly! Great job!" },
+  { text: "Bear is giving you the biggest hug ever! Squeeeeze! You're amazing!", subtitle: "Bear hug! Squeeeeze! Amazing!" },
+];
+
+window.toggleBreathing = function() {
+  if (breathingRunning) stopBreathingExercise();
+  else startBreathingExercise();
+};
+
+async function startBreathingExercise() {
+  breathingRunning = true;
+  breathingStopped = false;
+  document.getElementById('breathing-start-btn').innerHTML = '⏹️ Stop';
+
+  const circle = document.getElementById('breathing-circle');
+  const label = document.getElementById('breathing-label');
+  const counter = document.getElementById('breathing-counter');
+
+  // Intro
+  for (const step of BREATHING_INTRO) {
+    if (breathingStopped) return;
+    label.innerHTML = step.subtitle;
+    await speakStep(step.text);
+    if (breathingStopped) return;
+    await new Promise(r => setTimeout(r, 1500));
+  }
+
+  // Breathing cycles — each one tells a mini story
+  for (let cycle = 0; cycle < BREATHING_CYCLES_SCRIPTS.length; cycle++) {
+    if (breathingStopped) return;
+    counter.textContent = `Balloon ${cycle + 1} of ${BREATHING_CYCLES_SCRIPTS.length}`;
+
+    for (const phase of BREATHING_CYCLES_SCRIPTS[cycle].phases) {
+      if (breathingStopped) return;
+      circle.className = 'breathing-circle ' + phase.className;
+      label.innerHTML = phase.subtitle;
+      await speakStep(phase.text);
+      if (breathingStopped) return;
+      const extraWait = Math.max(500, phase.duration - 2000);
+      await new Promise(r => setTimeout(r, extraWait));
+    }
+  }
+
+  if (breathingStopped) return;
+
+  // Outro
+  circle.className = 'breathing-circle';
+  counter.textContent = '';
+  for (const step of BREATHING_OUTRO) {
+    if (breathingStopped) return;
+    label.innerHTML = step.subtitle;
+    await speakStep(step.text);
+    if (breathingStopped) return;
+    await new Promise(r => setTimeout(r, 1500));
+  }
+
+  if (!breathingStopped) {
+    playBell();
+    stopBreathingExercise();
+    completeActivity('Balloon Master!', 'You blew the best balloon ever!');
+  }
+}
+
+function stopBreathingExercise() {
+  breathingStopped = true;
+  breathingRunning = false;
+  speechSynthesis.cancel();
+  document.getElementById('breathing-circle').className = 'breathing-circle';
+  document.getElementById('breathing-label').innerHTML = 'Tap Start to begin!';
+  document.getElementById('breathing-counter').textContent = '';
+  document.getElementById('breathing-start-btn').innerHTML = '▶️ Start';
+}
+
+// ===== FEELINGS =====
+const FEELING_RESPONSES = {
+  happy: { text: "😊 That's wonderful! Bear is happy too!", emoji: '😊' },
+  calm: { text: "😌 So peaceful! You're doing great.", emoji: '😌' },
+  excited: { text: "🤩 Wow, how exciting! Let's channel that energy!", emoji: '🤩' },
+  sad: { text: "😢 It's okay to feel sad. Bear gives you a big hug! 🤗", emoji: '😢' },
+  angry: { text: "😠 It's okay to feel angry. Let's take a deep breath! 🌬️", emoji: '😠' },
+  scared: { text: "😨 You're safe here. Bear is right beside you! 🧸", emoji: '😨' },
+};
+window.selectFeeling = function(emotion, btnEl) {
+  document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('selected'));
+  btnEl.classList.add('selected');
+  const r = FEELING_RESPONSES[emotion];
+  const el = document.getElementById('feeling-response');
+  el.style.display = 'block'; el.textContent = r.text;
+  state.feelings.push({ emotion, timestamp: Date.now() });
+  if (state.feelings.length > 20) state.feelings = state.feelings.slice(-20);
+  addStar(); saveState();
+  setTimeout(() => completeActivity('Feelings Check-in!','Thank you for sharing!'), 1500);
+};
+
+// ===== MEDITATION =====
+const MEDITATIONS = {
+  ocean: { title:'Ocean Waves', duration:120, bgTop:'#48C9F0', bgBottom:'#1B8FC4',
+    creatures:['🐟','🐠','🐡','🐬','🐙','🦀','🐚','🪸','🐳'], count:10, moveStyle:'swim' },
+  forest: { title:'Magic Forest', duration:120, bgTop:'#7BCF6B', bgBottom:'#3A8A2F',
+    creatures:['🦋','🦋','🐝','🐞','🌸','🍄','🌻','🐿️'], count:9, moveStyle:'flutter' },
+  space: { title:'Space Adventure', duration:120, bgTop:'#1A1A4E', bgBottom:'#0D0D2B',
+    creatures:['⭐','🌟','✨','💫','🪐','🌙','🛸','☄️'], count:12, moveStyle:'drift' },
+  rain: { title:'Rainy Day', duration:120, bgTop:'#7EA8C0', bgBottom:'#4A6A7A',
+    creatures:['💧','💧','💧','🌈','☂️','💧','💧','🌸'], count:10, moveStyle:'fall' },
+};
+
+let meditationTimer = null;
+let meditationRemaining = 0;
+let meditationPaused = false;
+let currentMeditationKey = null;
+let canvasAnimFrame = null;
+let canvasCreatures = [];
+
+window.startMeditation = function(key) {
+  currentMeditationKey = key;
+  const med = MEDITATIONS[key];
+  meditationRemaining = med.duration;
+  meditationPaused = false;
+  meditationStopped = false;
+
+  document.getElementById('player-title').textContent = med.title;
+  document.getElementById('player-toggle-btn').innerHTML = '⏸️ Pause';
+  document.getElementById('volume-slider').value = audioVolume * 100;
+  document.getElementById('voice-status').textContent = '';
+  document.getElementById('subtitle-bar').textContent = 'Get ready...';
+  updateTimerDisplay();
+  showScreen('player');
+
+  playAmbientSound(key);
+  initCanvas(key);
+
+  meditationTimer = setInterval(() => {
+    if (!meditationPaused) {
+      meditationRemaining--;
+      updateTimerDisplay();
+      if (meditationRemaining <= 0) { clearInterval(meditationTimer); meditationTimer=null; }
+    }
+  }, 1000);
+
+  // Start guided voice
+  runGuidedMeditation(key);
+};
+
+function updateTimerDisplay() {
+  const m = Math.floor(Math.max(0,meditationRemaining)/60);
+  const s = Math.max(0,meditationRemaining)%60;
+  document.getElementById('player-timer').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+window.toggleMeditationPlayback = function() {
+  meditationPaused = !meditationPaused;
+  document.getElementById('player-toggle-btn').innerHTML = meditationPaused ? '▶️ Play' : '⏸️ Pause';
+  if (meditationPaused) {
+    if (currentAudio) currentAudio.pause();
+    if (speechSynthesis.speaking) speechSynthesis.pause();
+  } else {
+    if (currentAudio) currentAudio.play().catch(()=>{});
+    if (speechSynthesis.paused) speechSynthesis.resume();
+  }
+};
+
+window.stopMeditation = function() {
+  meditationStopped = true;
+  if (meditationTimer) { clearInterval(meditationTimer); meditationTimer=null; }
+  meditationPaused = false;
+  speechSynthesis.cancel();
+  stopAmbientSound();
+  stopCanvasAnimation();
+  currentMeditationKey = null;
+  showScreen('meditate');
+};
+
+// ===== BRIGHT CANVAS (decorative only, no clicking) =====
+function initCanvas(key) {
+  const canvas = document.getElementById('meditation-canvas');
+  const ctx = canvas.getContext('2d');
+  const med = MEDITATIONS[key];
+
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+
+  canvasCreatures = [];
+  for (let i = 0; i < med.count; i++) spawnCreature(W, H, med);
+
+  let bgStars = [];
+  if (key === 'space') for (let i = 0; i < 80; i++) bgStars.push({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*2+0.5, tw: Math.random()*Math.PI*2 });
+
+  let rainDrops = [];
+  if (key === 'rain') for (let i = 0; i < 60; i++) rainDrops.push({ x: Math.random()*W, y: Math.random()*H, speed: 1.5+Math.random()*2, len: 6+Math.random()*10 });
+
+  let time = 0;
+  function animate() {
+    if (!currentMeditationKey) return;
+    time += 0.016;
+    ctx.clearRect(0, 0, W, H);
+
+    // BRIGHT gradient background
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, med.bgTop);
+    grad.addColorStop(1, med.bgBottom);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Theme backgrounds
+    if (key === 'ocean') {
+      // Light shimmering waves
+      for (let w = 0; w < 3; w++) {
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(255,255,255,${0.08 - w*0.02})`;
+        for (let x = 0; x <= W; x += 3) {
+          const y = H*(0.25+w*0.2) + Math.sin(x*0.015 + time*(0.6-w*0.1) + w*2)*12;
+          if (x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+      }
+      // Light rays from top
+      for (let r = 0; r < 5; r++) {
+        ctx.fillStyle = `rgba(255,255,200,${0.03 + Math.sin(time*0.5+r)*0.01})`;
+        ctx.beginPath();
+        const rx = W*(0.15+r*0.18);
+        ctx.moveTo(rx, 0);
+        ctx.lineTo(rx-30, H);
+        ctx.lineTo(rx+30, H);
+        ctx.closePath(); ctx.fill();
+      }
+    }
+
+    if (key === 'forest') {
+      // Bright green ground
+      ctx.fillStyle = 'rgba(100,180,60,0.5)';
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 3) { const y = H*0.8+Math.sin(x*0.03)*6; if (x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+      // Bright trees
+      [W*0.08, W*0.28, W*0.52, W*0.72, W*0.93].forEach((tx,i) => {
+        const th = 70+i*8;
+        ctx.fillStyle = '#6B4226';
+        ctx.fillRect(tx-5, H*0.8-th*0.35, 10, th*0.4);
+        ctx.fillStyle = `hsl(${115+i*6}, 60%, ${40+i*3}%)`;
+        ctx.beginPath(); ctx.arc(tx, H*0.8-th*0.5, 22+i*3, 0, Math.PI*2); ctx.fill();
+      });
+      // Sun rays
+      for (let r = 0; r < 4; r++) {
+        ctx.fillStyle = `rgba(255,255,100,${0.04 + Math.sin(time*0.3+r)*0.02})`;
+        ctx.beginPath();
+        ctx.moveTo(W*(0.2+r*0.2), 0);
+        ctx.lineTo(W*(0.2+r*0.2)-20, H*0.6);
+        ctx.lineTo(W*(0.2+r*0.2)+20, H*0.6);
+        ctx.closePath(); ctx.fill();
+      }
+    }
+
+    if (key === 'space') {
+      bgStars.forEach(s => {
+        const a = 0.5+0.5*Math.abs(Math.sin(time*1.5+s.tw));
+        ctx.fillStyle = `rgba(255,255,255,${a})`;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
+      });
+      // Nebula glow
+      const ng = ctx.createRadialGradient(W*0.3, H*0.4, 0, W*0.3, H*0.4, W*0.4);
+      ng.addColorStop(0, 'rgba(100,50,200,0.08)');
+      ng.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = ng; ctx.fillRect(0,0,W,H);
+      const ng2 = ctx.createRadialGradient(W*0.7, H*0.6, 0, W*0.7, H*0.6, W*0.3);
+      ng2.addColorStop(0, 'rgba(50,100,200,0.06)');
+      ng2.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = ng2; ctx.fillRect(0,0,W,H);
+    }
+
+    if (key === 'rain') {
+      ctx.strokeStyle = 'rgba(200,220,240,0.25)'; ctx.lineWidth = 1;
+      rainDrops.forEach(d => {
+        d.y += d.speed; if (d.y > H) { d.y = -d.len; d.x = Math.random()*W; }
+        ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x-0.5, d.y+d.len); ctx.stroke();
+      });
+    }
+
+    // Draw creatures (decorative, larger, brighter)
+    if (!meditationPaused) {
+      canvasCreatures.forEach(c => {
+        if (med.moveStyle === 'swim') {
+          c.x += c.vx; c.y += Math.sin(time*1.5+c.phase)*0.5;
+          if (c.x > W+50) { c.x=-40; c.y=30+Math.random()*(H-60); }
+          if (c.x < -50) { c.x=W+40; c.y=30+Math.random()*(H-60); }
+        } else if (med.moveStyle === 'flutter') {
+          c.x += Math.sin(time*1.2+c.phase)*0.7;
+          c.y += Math.cos(time*0.9+c.phase*0.7)*0.5;
+          if (c.x<15) c.x=15; if (c.x>W-15) c.x=W-15;
+          if (c.y<15) c.y=15; if (c.y>H*0.75) c.y=H*0.75;
+        } else if (med.moveStyle === 'drift') {
+          c.x += Math.sin(time*0.4+c.phase)*0.35;
+          c.y += Math.cos(time*0.25+c.phase*1.2)*0.25;
+          if (c.x<10) c.x=10; if (c.x>W-10) c.x=W-10;
+          if (c.y<10) c.y=10; if (c.y>H-10) c.y=H-10;
+        } else if (med.moveStyle === 'fall') {
+          c.y += c.vy; c.x += Math.sin(time*0.8+c.phase)*0.4;
+          if (c.y > H+25) { c.y=-25; c.x=15+Math.random()*(W-30); }
+        }
+        const scale = 1 + Math.sin(time*1.5+c.phase)*0.06;
+        ctx.save(); ctx.translate(c.x, c.y); ctx.scale(scale, scale);
+        ctx.font = `${c.size}px sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(c.emoji, 0, 0);
+        ctx.restore();
+      });
+    } else {
+      canvasCreatures.forEach(c => {
+        ctx.font = `${c.size}px sans-serif`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(c.emoji, c.x, c.y);
+      });
+    }
+
+    canvasAnimFrame = requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+function spawnCreature(W, H, med) {
+  const emoji = med.creatures[Math.floor(Math.random()*med.creatures.length)];
+  let x, y, vx=0, vy=0;
+  if (med.moveStyle === 'swim') {
+    x = Math.random()*W; y = 30+Math.random()*(H-60);
+    vx = 0.3+Math.random()*0.7; if (Math.random()>0.5) vx=-vx;
+  } else if (med.moveStyle === 'flutter') {
+    x = 25+Math.random()*(W-50); y = 25+Math.random()*(H*0.65);
+  } else if (med.moveStyle === 'drift') {
+    x = 15+Math.random()*(W-30); y = 15+Math.random()*(H-30);
+  } else if (med.moveStyle === 'fall') {
+    x = 15+Math.random()*(W-30); y = Math.random()*H; vy = 0.4+Math.random()*0.8;
+  }
+  canvasCreatures.push({ emoji, x, y, vx, vy, size: 32+Math.random()*14, phase: Math.random()*Math.PI*2 });
+}
+
+function stopCanvasAnimation() {
+  if (canvasAnimFrame) { cancelAnimationFrame(canvasAnimFrame); canvasAnimFrame=null; }
+  canvasCreatures = [];
+}
+
+// ===== REWARDS =====
+function refreshRewards() {
+  document.getElementById('streak-number').textContent = state.streak;
+  document.getElementById('stars-count').textContent = state.stars;
+  const sv = document.getElementById('stars-visual');
+  const ds = Math.min(state.stars, 30);
+  sv.textContent = ds>0 ? '⭐'.repeat(ds) + (state.stars>30 ? ` +${state.stars-30}` : '') : 'Complete activities to earn stars!';
+  const fl = document.getElementById('recent-feelings-list');
+  if (state.feelings.length===0) fl.textContent='No feelings logged yet!';
+  else fl.textContent = state.feelings.slice(-8).map(f => FEELING_RESPONSES[f.emotion]?.emoji||'❓').join(' ');
+}
+
+// ===== CELEBRATION =====
+function completeActivity(title, subtitle) {
+  addStar(); saveState();
+  document.getElementById('celebration-text').textContent = title;
+  document.getElementById('celebration-sub').textContent = subtitle;
+  document.getElementById('celebration-overlay').classList.add('active');
+  spawnConfetti();
+}
+window.closeCelebration = function() {
+  document.getElementById('celebration-overlay').classList.remove('active');
+  document.getElementById('confetti-container').innerHTML = '';
+};
+function spawnConfetti() {
+  const c = document.getElementById('confetti-container'); c.innerHTML='';
+  const colors = ['#89CFF0','#C3B1E1','#98FB98','#FFDAB9','#FDFD96','#FF7F7F','#F0B800'];
+  for (let i=0;i<40;i++) {
+    const p = document.createElement('div'); p.className='confetti-piece';
+    p.style.left=Math.random()*100+'%'; p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDuration=(1.5+Math.random()*2)+'s'; p.style.animationDelay=(Math.random()*0.8)+'s';
+    p.style.width=(8+Math.random()*8)+'px'; p.style.height=(8+Math.random()*8)+'px';
+    p.style.borderRadius=Math.random()>0.5?'50%':'3px'; c.appendChild(p);
+  }
+  setTimeout(()=>{c.innerHTML='';}, 4000);
+}
+
+// Voices are loaded at the top of the script
+</script>
+</body>
+</html>

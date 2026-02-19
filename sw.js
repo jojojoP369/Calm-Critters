@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calm-critters-v1';
+const CACHE_NAME = 'calm-critters-v5';
 const ASSETS = [
     '/Calm-Critters/',
     '/Calm-Critters/index.html',
@@ -25,22 +25,33 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-// Fetch — serve from cache, fallback to network
+// Fetch — network-first for HTML (so code changes apply immediately), cache-first for assets
 self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((cached) => {
-            return cached || fetch(event.request).then((response) => {
-                // Cache successful responses for future offline use
+    // For navigation/HTML requests: always try network first
+    if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+        event.respondWith(
+            fetch(event.request).then((response) => {
                 if (response.status === 200) {
                     const clone = response.clone();
                     caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
                 }
                 return response;
             }).catch(() => {
-                // If offline and not cached, return the main page for navigation requests
-                if (event.request.mode === 'navigate') {
-                    return caches.match('/Calm-Critters/index.html');
+                return caches.match(event.request) || caches.match('/Calm-Critters/index.html');
+            })
+        );
+        return;
+    }
+
+    // For other assets: cache-first, fallback to network
+    event.respondWith(
+        caches.match(event.request).then((cached) => {
+            return cached || fetch(event.request).then((response) => {
+                if (response.status === 200) {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
                 }
+                return response;
             });
         })
     );

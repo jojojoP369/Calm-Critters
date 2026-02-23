@@ -9,6 +9,12 @@ Thumbs.db
 *.swo
 *~
 
+# Environment secrets
+.env
+
+# Node
+node_modules/
+
 # Plan/session files (optional, remove if you want these tracked)
 PLAN.md
 SESSION-STATE.md

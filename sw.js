@@ -1,10 +1,11 @@
-const CACHE_NAME = 'calm-critters-v5';
+const CACHE_NAME = 'calm-critters-v6';
 const ASSETS = [
-    '/Calm-Critters/',
-    '/Calm-Critters/index.html',
-    '/Calm-Critters/manifest.json',
-    '/Calm-Critters/icons/icon-192.svg',
-    '/Calm-Critters/icons/icon-512.svg',
+    '/',
+    '/index.html',
+    '/manifest.json',
+    '/icons/icon-192.svg',
+    '/icons/icon-512.svg',
+    '/privacy.html',
 ];
 
 // Install — cache core assets
@@ -27,6 +28,9 @@ self.addEventListener('activate', (event) => {
 
 // Fetch — network-first for HTML (so code changes apply immediately), cache-first for assets
 self.addEventListener('fetch', (event) => {
+    // Skip non-GET requests (e.g., POST to /api/tts)
+    if (event.request.method !== 'GET') return;
+
     // For navigation/HTML requests: always try network first
     if (event.request.mode === 'navigate' || event.request.destination === 'document') {
         event.respondWith(
@@ -37,7 +41,7 @@ self.addEventListener('fetch', (event) => {
                 }
                 return response;
             }).catch(() => {
-                return caches.match(event.request) || caches.match('/Calm-Critters/index.html');
+                return caches.match(event.request) || caches.match('/index.html');
             })
         );
         return;

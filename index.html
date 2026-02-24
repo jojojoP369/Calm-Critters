@@ -4245,8 +4245,14 @@
 
       showScreen('rescue');
 
-      // Tiny mode: narrate the intro
-      tinyNarrate('Bear is here to help you feel better!');
+      // Stop any existing sounds before starting calm music
+      stopAmbientSound();
+      MeditationMusic.stop();
+      stopAllElevenAudio();
+      speechSynthesis.cancel();
+
+      // Start calm background music
+      MeditationMusic.start();
 
       await runRescueSteps(routine.steps, routine);
 
@@ -5921,6 +5927,10 @@
 
     // ===== PARENT ZONE =====
     function switchParentTab(tab) {
+      // Stop Together Mode audio when switching away
+      if (togetherRunning && tab !== 'together') {
+        stopTogetherMode();
+      }
       document.querySelectorAll('.parent-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.parent-panel').forEach(p => p.classList.remove('active'));
       document.querySelector(`.parent-tab[onclick*="${tab}"]`).classList.add('active');
@@ -6060,13 +6070,17 @@
       // Complete — only celebrate if the session finished naturally
       if (elapsed >= totalSeconds) {
         togetherRunning = false;
+        // Stop all in-flight audio from the last cycle
+        stopAllElevenAudio();
+        speechSynthesis.cancel();
+        speakGeneration++;
         label.textContent = 'Amazing! ⭐';
         sublabel.textContent = 'You both did great! Star earned!';
         circle.className = 'together-circle';
         circle.textContent = '🎉';
         btn.textContent = 'Start Breathing';
         timerEl.textContent = '';
-        elevenSpeak("Amazing! You both did great. Star earned!");
+        await elevenSpeak("Amazing! You both did great. Star earned!");
         addStar();
         logActivity('together');
       }
@@ -6074,6 +6088,7 @@
 
     function stopTogetherMode() {
       togetherRunning = false;
+      speakGeneration++;
       stopAllElevenAudio();
       speechSynthesis.cancel();
       const btn = document.getElementById('together-start-btn');

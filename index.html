@@ -4612,7 +4612,6 @@
       stopAll();
       showScreen('home');
     };
-
     // ===== TTS ENGINE (ElevenLabs cloud voice) =====
     let ttsQueue = [];
     let ttsPlaying = false;
@@ -4622,8 +4621,56 @@
     // TTS proxy endpoint (voice config lives on server, not in frontend)
     const TTS_ENDPOINT = '/api/tts';
 
-    // Audio cache to avoid re-fetching identical phrases
-    const ttsCache = new Map();
+    // ── Persistent Audio Cache (IndexedDB) ──
+    // Stores audio blobs permanently so each phrase only costs ElevenLabs credits ONCE.
+    // After first fetch, all subsequent plays come from local storage — even after page reload.
+    const TTS_DB_NAME = 'calm-critters-tts';
+    const TTS_DB_VERSION = 1;
+    const TTS_STORE = 'audio';
+    let ttsDB = null;
+
+    // Open/create the IndexedDB database
+    function openTTSDB() {
+      return new Promise((resolve, reject) => {
+        if (ttsDB) { resolve(ttsDB); return; }
+        const req = indexedDB.open(TTS_DB_NAME, TTS_DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(TTS_STORE)) {
+            db.createObjectStore(TTS_STORE); // key = text string
+          }
+        };
+        req.onsuccess = (e) => { ttsDB = e.target.result; resolve(ttsDB); };
+        req.onerror = () => { resolve(null); }; // graceful fallback
+      });
+    }
+
+    // Get cached audio blob from IndexedDB
+    async function getCachedAudio(text) {
+      try {
+        const db = await openTTSDB();
+        if (!db) return null;
+        return new Promise((resolve) => {
+          const tx = db.transaction(TTS_STORE, 'readonly');
+          const req = tx.objectStore(TTS_STORE).get(text);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => resolve(null);
+        });
+      } catch (e) { return null; }
+    }
+
+    // Save audio blob to IndexedDB
+    async function cacheAudio(text, blob) {
+      try {
+        const db = await openTTSDB();
+        if (!db) return;
+        const tx = db.transaction(TTS_STORE, 'readwrite');
+        tx.objectStore(TTS_STORE).put(blob, text);
+      } catch (e) { /* non-critical — just won't cache */ }
+    }
+
+    // In-memory blob URL map for current session (avoids creating duplicate blob URLs)
+    const ttsBlobURLs = new Map();
 
     // Fetch audio from backend TTS proxy and return as Audio element
     let activeElevenAudios = [];
@@ -4634,10 +4681,11 @@
     async function elevenSpeak(text) {
       const gen = speakGeneration; // capture current generation
 
-      // Check cache first — cache stores blob URLs, not Audio objects
-      if (ttsCache.has(text)) {
-        if (gen !== speakGeneration) return; // stopped while we were called
-        const audio = new Audio(ttsCache.get(text));
+      // 1. Check in-memory blob URL cache (fastest — same session)
+      if (ttsBlobURLs.has(text)) {
+        if (gen !== speakGeneration) return;
+        const audio = new Audio(ttsBlobURLs.get(text));
+        audio.volume = voiceVolume;
         activeElevenAudios.push(audio);
         return new Promise((resolve) => {
           audio.onended = () => { activeElevenAudios = activeElevenAudios.filter(a => a !== audio); resolve(); };
@@ -4646,6 +4694,23 @@
         });
       }
 
+      // 2. Check IndexedDB persistent cache (survives page reloads — zero credits)
+      const cachedBlob = await getCachedAudio(text);
+      if (gen !== speakGeneration) return;
+      if (cachedBlob) {
+        const url = URL.createObjectURL(cachedBlob);
+        ttsBlobURLs.set(text, url); // keep in memory for this session
+        const audio = new Audio(url);
+        audio.volume = voiceVolume;
+        activeElevenAudios.push(audio);
+        return new Promise((resolve) => {
+          audio.onended = () => { activeElevenAudios = activeElevenAudios.filter(a => a !== audio); resolve(); };
+          audio.onerror = resolve;
+          audio.play().catch(() => resolve());
+        });
+      }
+
+      // 3. Not cached — fetch from ElevenLabs (costs credits, but only this once!)
       try {
         const response = await fetch(TTS_ENDPOINT, {
           method: 'POST',
@@ -4668,11 +4733,13 @@
         // GUARD: check again after blob read
         if (gen !== speakGeneration) return;
 
-        const url = URL.createObjectURL(blob);
-        const audio = new Audio(url);
+        // Save to persistent cache (IndexedDB) — never fetch this phrase again!
+        cacheAudio(text, blob);
 
-        // Cache the blob URL for reuse
-        ttsCache.set(text, url);
+        const url = URL.createObjectURL(blob);
+        ttsBlobURLs.set(text, url); // in-memory for this session
+        const audio = new Audio(url);
+        audio.volume = voiceVolume;
 
         activeElevenAudios.push(audio);
         return new Promise((resolve) => {
@@ -7551,9 +7618,9 @@
       // 1b. Invalidate all in-flight speakStep calls
       speakGeneration++;
 
-      // 2. Clear TTS cache (blob URLs may be stale after stop)
-      ttsCache.forEach(url => { try { URL.revokeObjectURL(url); } catch (e) { } });
-      ttsCache.clear();
+      // 2. Revoke in-memory blob URLs (IndexedDB persistent cache stays intact)
+      ttsBlobURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch (e) { } });
+      ttsBlobURLs.clear();
 
       // 2. Cancel meditation timer & animation
       if (meditationTimer) { clearInterval(meditationTimer); meditationTimer = null; }
@@ -7663,10 +7730,14 @@
     };
 
     window.resetAllData = function () {
-      if (confirm('This will reset all stars, streaks, feelings history, and curriculum progress. Are you sure?')) {
+      if (confirm('This will reset all stars, streaks, feelings history, curriculum progress, and cached voice audio. Are you sure?')) {
         state = defaultState();
         saveState();
         try { localStorage.removeItem('calm-critters-settings'); } catch (e) { }
+        // Clear persistent TTS cache
+        try { indexedDB.deleteDatabase(TTS_DB_NAME); ttsDB = null; } catch (e) { }
+        ttsBlobURLs.forEach(url => { try { URL.revokeObjectURL(url); } catch (e) { } });
+        ttsBlobURLs.clear();
         document.body.classList.remove('dark-mode');
         const toggle = document.getElementById('dark-mode-toggle');
         if (toggle) toggle.checked = false;

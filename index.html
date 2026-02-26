@@ -4672,6 +4672,14 @@
     // In-memory blob URL map for current session (avoids creating duplicate blob URLs)
     const ttsBlobURLs = new Map();
 
+    // ── Local Audio File Cache (pre-generated MP3s) ──
+    // Loaded from sounds/tts/manifest.json — maps text → filename
+    let ttsManifest = {};
+    fetch('/sounds/tts/manifest.json')
+      .then(r => r.ok ? r.json() : {})
+      .then(m => { ttsManifest = m; console.log(`📂 Local TTS cache: ${Object.keys(m).length} phrases`); })
+      .catch(() => { /* no local cache yet — that's fine */ });
+
     // Fetch audio from backend TTS proxy and return as Audio element
     let activeElevenAudios = [];
     function stopAllElevenAudio() {
@@ -4680,6 +4688,19 @@
     }
     async function elevenSpeak(text) {
       const gen = speakGeneration; // capture current generation
+
+      // 0. Check local pre-generated audio files (fastest — zero API, zero IndexedDB)
+      if (ttsManifest[text]) {
+        if (gen !== speakGeneration) return;
+        const audio = new Audio('/sounds/tts/' + ttsManifest[text]);
+        audio.volume = voiceVolume;
+        activeElevenAudios.push(audio);
+        return new Promise((resolve) => {
+          audio.onended = () => { activeElevenAudios = activeElevenAudios.filter(a => a !== audio); resolve(); };
+          audio.onerror = resolve;
+          audio.play().catch(() => resolve());
+        });
+      }
 
       // 1. Check in-memory blob URL cache (fastest — same session)
       if (ttsBlobURLs.has(text)) {
@@ -4755,36 +4776,17 @@
     }
 
     // Fallback: browser TTS if ElevenLabs is unavailable
-    // Prioritized voice list — best sounding macOS/Chrome voices first
-    const PREFERRED_VOICES = [
-      'samantha', 'karen', 'shelley', 'flo', 'sandy',     // best macOS voices
-      'google uk english female', 'google us english',      // Chrome remote voices
-      'moira', 'daniel', 'tessa',                           // other decent macOS voices
-    ];
-    let bestVoice = null;
-
-    // Pre-load voices (some browsers load them async)
-    function loadBestVoice() {
-      const voices = speechSynthesis.getVoices();
-      if (!voices.length) return;
-      for (const pref of PREFERRED_VOICES) {
-        const match = voices.find(v => v.name.toLowerCase().includes(pref));
-        if (match) { bestVoice = match; return; }
-      }
-      // Last resort: any English voice
-      bestVoice = voices.find(v => v.lang.startsWith('en')) || null;
-    }
-    speechSynthesis.onvoiceschanged = loadBestVoice;
-    loadBestVoice();
-
     function fallbackSpeak(text) {
       return new Promise((resolve) => {
         speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
-        u.rate = 0.72;   // slightly slower for calm delivery
-        u.pitch = 1.0;   // natural pitch
-        u.volume = voiceVolume;
-        if (bestVoice) u.voice = bestVoice;
+        u.rate = 0.68;
+        u.pitch = 0.95;
+        u.volume = 0.85;
+        const voices = speechSynthesis.getVoices();
+        const best = voices.find(v => /samantha|fiona|karen|moira/i.test(v.name))
+          || voices.find(v => v.lang.startsWith('en'));
+        if (best) u.voice = best;
         u.onend = resolve;
         u.onerror = resolve;
         speechSynthesis.speak(u);

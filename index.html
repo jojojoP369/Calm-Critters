@@ -4755,17 +4755,36 @@
     }
 
     // Fallback: browser TTS if ElevenLabs is unavailable
+    // Prioritized voice list — best sounding macOS/Chrome voices first
+    const PREFERRED_VOICES = [
+      'samantha', 'karen', 'shelley', 'flo', 'sandy',     // best macOS voices
+      'google uk english female', 'google us english',      // Chrome remote voices
+      'moira', 'daniel', 'tessa',                           // other decent macOS voices
+    ];
+    let bestVoice = null;
+
+    // Pre-load voices (some browsers load them async)
+    function loadBestVoice() {
+      const voices = speechSynthesis.getVoices();
+      if (!voices.length) return;
+      for (const pref of PREFERRED_VOICES) {
+        const match = voices.find(v => v.name.toLowerCase().includes(pref));
+        if (match) { bestVoice = match; return; }
+      }
+      // Last resort: any English voice
+      bestVoice = voices.find(v => v.lang.startsWith('en')) || null;
+    }
+    speechSynthesis.onvoiceschanged = loadBestVoice;
+    loadBestVoice();
+
     function fallbackSpeak(text) {
       return new Promise((resolve) => {
         speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
-        u.rate = 0.68;
-        u.pitch = 0.95;
-        u.volume = 0.85;
-        const voices = speechSynthesis.getVoices();
-        const best = voices.find(v => /samantha|fiona|karen|moira/i.test(v.name))
-          || voices.find(v => v.lang.startsWith('en'));
-        if (best) u.voice = best;
+        u.rate = 0.72;   // slightly slower for calm delivery
+        u.pitch = 1.0;   // natural pitch
+        u.volume = voiceVolume;
+        if (bestVoice) u.voice = bestVoice;
         u.onend = resolve;
         u.onerror = resolve;
         speechSynthesis.speak(u);

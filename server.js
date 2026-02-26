@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -20,7 +21,7 @@ const VOICE_SETTINGS = {
 };
 
 // ── Middleware ───────────────────────────────────────────────────────
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 
 // Security headers
 app.use((req, res, next) => {
@@ -31,6 +32,18 @@ app.use((req, res, next) => {
     next();
 });
 
+// Rate limiting for TTS endpoint — prevents API key abuse
+const ttsLimiter = rateLimit({
+    windowMs: 60 * 1000,    // 1-minute window
+    max: 60,                // max 60 requests per minute per IP
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many TTS requests. Please slow down.' },
+});
+
+// Max text length for TTS (prevents sending huge payloads to ElevenLabs)
+const MAX_TTS_TEXT_LENGTH = 500;
+
 // Serve static files (index.html, sw.js, icons/, sounds/, manifest.json)
 app.use(express.static(path.join(__dirname)));
 
@@ -40,11 +53,15 @@ app.get('/health', (req, res) => {
 });
 
 // ── POST /api/tts ───────────────────────────────────────────────────
-app.post('/api/tts', async (req, res) => {
+app.post('/api/tts', ttsLimiter, async (req, res) => {
     const { text } = req.body;
 
     if (!text || typeof text !== 'string' || text.trim().length === 0) {
         return res.status(400).json({ error: 'Missing or empty "text" field' });
+    }
+
+    if (text.trim().length > MAX_TTS_TEXT_LENGTH) {
+        return res.status(400).json({ error: `Text too long (max ${MAX_TTS_TEXT_LENGTH} characters)` });
     }
 
     if (!ELEVENLABS_API_KEY) {

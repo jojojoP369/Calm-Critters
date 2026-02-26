@@ -31,9 +31,10 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap');
-
     * {
       margin: 0;
       padding: 0;
@@ -2980,6 +2981,220 @@
         opacity: 0;
       }
     }
+
+    /* ── Settings Panel ── */
+    .settings-section {
+      margin-bottom: 24px;
+    }
+
+    .settings-section h3 {
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 14px;
+      margin-bottom: 8px;
+    }
+
+    .settings-row label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .settings-row .settings-sublabel {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      display: none;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #ccc;
+      border-radius: 28px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    .toggle-switch input:checked+.toggle-slider {
+      background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    }
+
+    .toggle-switch input:checked+.toggle-slider::before {
+      transform: translateX(24px);
+    }
+
+    /* Volume Slider */
+    .volume-slider {
+      width: 120px;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #a29bfe, #ddd);
+      outline: none;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ── Dark / Night Mode ── */
+    body.dark-mode {
+      --text: #E0E0F0;
+      --bg-gradient: linear-gradient(135deg, #1a1a3e 0%, #2d1b4e 50%, #1a2a3e 100%);
+      background: var(--bg-gradient);
+      transition: background 0.6s ease, color 0.6s ease;
+    }
+
+    body.dark-mode .screen {
+      color: #E0E0F0;
+    }
+
+    body.dark-mode .activity-btn {
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: #E0E0F0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .activity-btn:hover {
+      background: rgba(255, 255, 255, 0.14) !important;
+    }
+
+    body.dark-mode .meditation-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #E0E0F0;
+    }
+
+    body.dark-mode .back-btn {
+      background: rgba(40, 40, 80, 0.85);
+      color: #E0E0F0;
+    }
+
+    body.dark-mode .settings-row {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    body.dark-mode .settings-row label,
+    body.dark-mode .settings-section h3 {
+      color: #E0E0F0;
+    }
+
+    body.dark-mode .parent-tab {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ccc;
+    }
+
+    body.dark-mode .parent-tab.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    body.dark-mode .dash-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .coreg-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .feelings-btn {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    body.dark-mode .celebration-overlay .celebration-card {
+      background: rgba(30, 30, 60, 0.95);
+      color: #E0E0F0;
+    }
+
+    body.dark-mode .app-subtitle {
+      color: rgba(224, 224, 240, 0.75);
+    }
+
+    body.dark-mode .calm-now-modal {
+      background: rgba(30, 30, 60, 0.97);
+      color: #E0E0F0;
+    }
+
+    body.dark-mode #calm-now-fab {
+      background: linear-gradient(135deg, #4a1a3e, #6c2050);
+    }
+
+    body.dark-mode .rescue-step-card {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.1) !important;
+      color: #E0E0F0;
+    }
+
+    body.dark-mode .age-portal {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode .age-portal-label,
+    body.dark-mode .age-portal-desc {
+      color: #ccc;
+    }
+
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js" defer></script>
 
@@ -3024,7 +3239,7 @@
   <!-- AGE PICKER -->
   <div id="agepicker-screen" class="screen">
     <div class="mascot-container">
-      <img src="images/characters/bear-waving.png" alt="Bear" class="character-img character-img-large">
+      <img src="images/characters/bear-waving.webp" alt="Bear" class="character-img character-img-large">
     </div>
     <h1 class="age-picker-title">Calm Critters</h1>
     <p class="age-picker-sub">Pick your age group to begin!</p>
@@ -3032,7 +3247,7 @@
 
       <button class="age-portal-card age-portal-tiny" onclick="selectAge('tiny')">
         <div class="age-portal-header">
-          <span class="age-portal-icon"><img src="images/characters/bear-waving.png" alt="Bear"></span>
+          <span class="age-portal-icon"><img src="images/characters/bear-waving.webp" alt="Bear"></span>
           <div class="age-portal-title-wrap">
             <div class="age-portal-label">Little Cubs</div>
             <div class="age-portal-range">Ages 3–6</div>
@@ -3048,7 +3263,7 @@
 
       <button class="age-portal-card age-portal-explorer" onclick="selectAge('explorer')">
         <div class="age-portal-header">
-          <span class="age-portal-icon"><img src="images/characters/turtle.png" alt="Turtle"></span>
+          <span class="age-portal-icon"><img src="images/characters/turtle.webp" alt="Turtle"></span>
           <div class="age-portal-title-wrap">
             <div class="age-portal-label">Explorers</div>
             <div class="age-portal-range">Ages 6–8</div>
@@ -3064,7 +3279,7 @@
 
       <button class="age-portal-card age-portal-independent" onclick="selectAge('independent')">
         <div class="age-portal-header">
-          <span class="age-portal-icon"><img src="images/characters/lion.png" alt="Lion"></span>
+          <span class="age-portal-icon"><img src="images/characters/lion.webp" alt="Lion"></span>
           <div class="age-portal-title-wrap">
             <div class="age-portal-label">Trailblazers</div>
             <div class="age-portal-range">Ages 9–10</div>
@@ -3090,7 +3305,7 @@
     <button class="back-btn" onclick="showScreen('agepicker')">⬅️</button>
     <div id="age-mode-badge" class="age-mode-badge"></div>
     <div class="mascot-container">
-      <img id="home-mascot" src="images/characters/bear-waving.png" alt="Bear"
+      <img id="home-mascot" src="images/characters/bear-waving.webp" alt="Bear"
         class="character-img character-img-large">
     </div>
     <h1 class="app-title">Calm Critters</h1>
@@ -3182,7 +3397,7 @@
     <button class="back-btn" onclick="showScreen('home')">⬅️</button>
     <h2 class="screen-title" id="breathing-title">Breathe with Bear</h2>
     <div class="breathing-area">
-      <img id="breathing-character" src="images/characters/bear-meditating.png" alt="Bear meditating"
+      <img id="breathing-character" src="images/characters/bear-meditating.webp" alt="Bear meditating"
         class="character-img character-img-medium mascot-breathing">
       <div class="breathing-circle-container">
         <div class="breathing-glow-ring ring-1" id="breath-ring-1"></div>
@@ -3200,7 +3415,7 @@
   <div id="feelings-screen" class="screen">
     <button class="back-btn" onclick="showScreen('home')">⬅️</button>
     <h2 class="screen-title">How Do You Feel?</h2>
-    <img id="feelings-character" src="images/characters/bear-waving.png" alt="Bear"
+    <img id="feelings-character" src="images/characters/bear-waving.webp" alt="Bear"
       class="character-img character-img-medium character-img-wiggle">
     <div class="feelings-grid">
       <button class="feeling-btn" onclick="selectFeeling('happy', this)"><span class="icon">😊</span> Happy</button>
@@ -3248,7 +3463,7 @@
   <div id="rewards-screen" class="screen">
     <button class="back-btn" onclick="showScreen('home')">⬅️</button>
     <h2 class="screen-title">Your Rewards!</h2>
-    <img id="rewards-character" src="images/characters/bear-celebrating.png" alt="Bear celebrating"
+    <img id="rewards-character" src="images/characters/bear-celebrating.webp" alt="Bear celebrating"
       class="character-img character-img-medium character-img-bounce">
     <div class="rewards-area">
       <div class="streak-display">
@@ -3271,7 +3486,7 @@
   <div id="journey-screen" class="screen">
     <button class="back-btn" onclick="showScreen('home')">⬅️</button>
     <h2 class="screen-title">🦸 Calm Superpowers</h2>
-    <img id="journey-character" src="images/characters/bear-meditating.png" alt="Bear"
+    <img id="journey-character" src="images/characters/bear-meditating.webp" alt="Bear"
       class="character-img character-img-medium" style="animation: float 3s ease-in-out infinite;">
     <div id="journey-path" class="journey-path">
       <!-- Dynamically rendered by JS -->
@@ -3283,7 +3498,7 @@
     <button class="back-btn" onclick="stopCurriculumLesson()">⬅️</button>
     <h2 id="curriculum-lesson-title" class="screen-title">Calm Breath</h2>
     <div class="curriculum-area">
-      <img id="curriculum-character" src="images/characters/bear-meditating.png" alt="Bear"
+      <img id="curriculum-character" src="images/characters/bear-meditating.webp" alt="Bear"
         class="character-img character-img-medium mascot-breathing">
       <div id="curriculum-step-label" class="curriculum-step-label">Get ready...</div>
       <div class="curriculum-progress-bar">
@@ -3318,7 +3533,7 @@
   <!-- CELEBRATION -->
   <div id="celebration-overlay" class="celebration-overlay">
     <div class="celebration-box">
-      <img id="celebration-character" src="images/characters/bear-celebrating-close.png" alt="Bear celebrating"
+      <img id="celebration-character" src="images/characters/bear-celebrating-close.webp" alt="Bear celebrating"
         class="celebration-character">
       <div class="celebration-star">🌟</div>
       <div id="celebration-text" class="celebration-text">Great Job!</div>
@@ -3338,12 +3553,13 @@
       <button class="parent-tab active" onclick="switchParentTab('together')">🤝 Together</button>
       <button class="parent-tab" onclick="switchParentTab('coreg')">💆 Co-Reg</button>
       <button class="parent-tab" onclick="switchParentTab('dashboard')">📊 Dashboard</button>
+      <button class="parent-tab" onclick="switchParentTab('settings')">⚙️ Settings</button>
     </div>
 
     <!-- Together Mode -->
     <div id="parent-together" class="parent-panel active">
       <div class="together-area">
-        <img src="images/backgrounds/together-mode.png" alt="Parent and child meditating" class="together-scene-img">
+        <img src="images/backgrounds/together-mode.webp" alt="Parent and child meditating" class="together-scene-img">
         <p style="color:#666;margin:0 0 10px;">Breathe together with your child using one shared animation.</p>
         <div class="together-circle-wrap">
           <div class="together-glow-ring tg-ring-1" id="tg-ring-1"></div>
@@ -3418,6 +3634,48 @@
         </div>
       </div>
       <div class="dash-note">📋 Privacy-first: all data stays on this device.</div>
+    </div>
+
+    <!-- Settings -->
+    <div id="parent-settings" class="parent-panel">
+      <div class="settings-section">
+        <h3>🌙 Appearance</h3>
+        <div class="settings-row">
+          <div>
+            <label>Night Mode</label>
+            <div class="settings-sublabel">Dimmer colors for bedtime sessions</div>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode(this.checked)">
+            <span class="toggle-slider"></span>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>🔊 Volume</h3>
+        <div class="settings-row">
+          <label>🗣️ Voice</label>
+          <input type="range" class="volume-slider" id="voice-volume" min="0" max="100" value="85"
+            oninput="setVoiceVolume(this.value)">
+        </div>
+        <div class="settings-row">
+          <label>🎵 Music</label>
+          <input type="range" class="volume-slider" id="music-volume" min="0" max="100" value="35"
+            oninput="setMusicVolume(this.value)">
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>🗑️ Data</h3>
+        <div class="settings-row">
+          <div>
+            <label>Reset All Progress</label>
+            <div class="settings-sublabel">Stars, streaks, and history</div>
+          </div>
+          <button onclick="resetAllData()"
+            style="background:linear-gradient(135deg,#e57373,#ff7f7f);color:#fff;border:none;padding:8px 16px;border-radius:12px;font-weight:700;cursor:pointer;font-size:0.85rem;">Reset</button>
+        </div>
+      </div>
+      <div class="dash-note">📋 All settings are saved on this device.</div>
     </div>
   </div>
 
@@ -3807,24 +4065,24 @@
     const AGE_CHARACTERS = {
       tiny: {
         name: 'Bear',
-        primary: 'images/characters/bear-waving.png',
-        meditating: 'images/characters/bear-meditating.png',
-        celebrating: 'images/characters/bear-celebrating.png',
-        celebratingClose: 'images/characters/bear-celebrating-close.png',
+        primary: 'images/characters/bear-waving.webp',
+        meditating: 'images/characters/bear-meditating.webp',
+        celebrating: 'images/characters/bear-celebrating.webp',
+        celebratingClose: 'images/characters/bear-celebrating-close.webp',
       },
       explorer: {
         name: 'Turtle',
-        primary: 'images/characters/turtle.png',
-        meditating: 'images/characters/turtle.png',
-        celebrating: 'images/characters/turtle.png',
-        celebratingClose: 'images/characters/turtle.png',
+        primary: 'images/characters/turtle.webp',
+        meditating: 'images/characters/turtle.webp',
+        celebrating: 'images/characters/turtle.webp',
+        celebratingClose: 'images/characters/turtle.webp',
       },
       independent: {
         name: 'Lion',
-        primary: 'images/characters/lion.png',
-        meditating: 'images/characters/lion.png',
-        celebrating: 'images/characters/lion.png',
-        celebratingClose: 'images/characters/lion.png',
+        primary: 'images/characters/lion.webp',
+        meditating: 'images/characters/lion.webp',
+        celebrating: 'images/characters/lion.webp',
+        celebratingClose: 'images/characters/lion.webp',
       },
     };
 
@@ -3917,19 +4175,18 @@
       rain: 'https://moodist.mvze.net/sounds/rain/light-rain.mp3',
     };
     let currentAudio = null;
-    let audioVolume = 0.6;
 
     function playAmbientSound(key) {
       stopAmbientSound();
       currentAudio = new Audio(SOUNDS[key]);
       currentAudio.loop = true;
-      currentAudio.volume = audioVolume * 0.4; // lower so voice is clear
+      currentAudio.volume = musicVolume * 0.5; // lower so voice is clear
       currentAudio.play().catch(() => { });
     }
     function stopAmbientSound() { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; } }
     window.setVolume = function (val) {
-      audioVolume = val / 100;
-      if (currentAudio) currentAudio.volume = audioVolume * 0.4;
+      musicVolume = val / 100;
+      if (currentAudio) currentAudio.volume = musicVolume * 0.5;
     };
 
     function playBell() {
@@ -4991,10 +5248,10 @@
     // ===== MEDITATION =====
     // Visual config shared across ages; titles/durations/descriptions vary
     const MEDITATION_VISUALS = {
-      ocean: { bgTop: '#48C9F0', bgBottom: '#1B8FC4', bgImage: 'images/backgrounds/ocean.png', characterImg: 'images/characters/turtle.png', creatures: ['🐟', '🐠', '🐡', '🐬', '🐙', '🦀', '🐚', '🪸', '🐳'], count: 10, moveStyle: 'swim' },
-      forest: { bgTop: '#7BCF6B', bgBottom: '#3A8A2F', bgImage: 'images/backgrounds/forest-path.png', characterImg: 'images/characters/owl.png', creatures: ['🦋', '🦋', '🐝', '🐞', '🌸', '🍄', '🌻', '🐿️'], count: 9, moveStyle: 'flutter' },
-      space: { bgTop: '#1A1A4E', bgBottom: '#0D0D2B', bgImage: 'images/characters/meadow-golden.png', characterImg: 'images/characters/butterfly.png', creatures: ['⭐', '🌟', '✨', '💫', '🪐', '🌙', '🛸', '☄️'], count: 12, moveStyle: 'drift' },
-      rain: { bgTop: '#7EA8C0', bgBottom: '#4A6A7A', bgImage: 'images/characters/forest-mushrooms.png', characterImg: 'images/characters/bear-meditating-side.png', creatures: ['💧', '💧', '💧', '🌈', '☂️', '💧', '💧', '🌸'], count: 10, moveStyle: 'fall' },
+      ocean: { bgTop: '#48C9F0', bgBottom: '#1B8FC4', bgImage: 'images/backgrounds/ocean.webp', characterImg: 'images/characters/turtle.webp', creatures: ['🐟', '🐠', '🐡', '🐬', '🐙', '🦀', '🐚', '🪸', '🐳'], count: 10, moveStyle: 'swim' },
+      forest: { bgTop: '#7BCF6B', bgBottom: '#3A8A2F', bgImage: 'images/backgrounds/forest-path.webp', characterImg: 'images/characters/owl.webp', creatures: ['🦋', '🦋', '🐝', '🐞', '🌸', '🍄', '🌻', '🐿️'], count: 9, moveStyle: 'flutter' },
+      space: { bgTop: '#1A1A4E', bgBottom: '#0D0D2B', bgImage: 'images/characters/meadow-golden.webp', characterImg: 'images/characters/butterfly.webp', creatures: ['⭐', '🌟', '✨', '💫', '🪐', '🌙', '🛸', '☄️'], count: 12, moveStyle: 'drift' },
+      rain: { bgTop: '#7EA8C0', bgBottom: '#4A6A7A', bgImage: 'images/characters/forest-mushrooms.webp', characterImg: 'images/characters/bear-meditating-side.webp', creatures: ['💧', '💧', '💧', '🌈', '☂️', '💧', '💧', '🌸'], count: 10, moveStyle: 'fall' },
     };
     const MEDITATION_INFO = {
       tiny: {
@@ -5041,7 +5298,7 @@
 
       document.getElementById('player-title').textContent = med.title;
       document.getElementById('player-toggle-btn').innerHTML = '⏸️ Pause';
-      document.getElementById('volume-slider').value = audioVolume * 100;
+      document.getElementById('volume-slider').value = musicVolume * 100;
       document.getElementById('voice-status').textContent = '';
       document.getElementById('subtitle-bar').textContent = 'Get ready...';
       updateTimerDisplay();
@@ -5086,9 +5343,13 @@
       if (meditationPaused) {
         if (currentAudio) currentAudio.pause();
         if (speechSynthesis.speaking) speechSynthesis.pause();
+        // Pause ElevenLabs TTS audio
+        activeElevenAudios.forEach(a => { try { a.pause(); } catch (e) { } });
       } else {
         if (currentAudio) currentAudio.play().catch(() => { });
         if (speechSynthesis.paused) speechSynthesis.resume();
+        // Resume ElevenLabs TTS audio
+        activeElevenAudios.forEach(a => { try { a.play().catch(() => { }); } catch (e) { } });
       }
     };
 
@@ -7333,6 +7594,91 @@
       _origShowScreen(name);
       if (name === 'journey') renderJourneyPath();
       if (name === 'affirmations') renderAffirmationScreen();
+    };
+
+    // ===== SETTINGS =====
+    let voiceVolume = 0.85;  // voice volume (0-1)
+    let musicVolume = 0.35;  // music volume (0-1)
+
+    // Load settings from localStorage
+    (function loadSettings() {
+      try {
+        const s = JSON.parse(localStorage.getItem('calm-critters-settings') || '{}');
+        if (s.darkMode) {
+          document.body.classList.add('dark-mode');
+          const toggle = document.getElementById('dark-mode-toggle');
+          if (toggle) toggle.checked = true;
+        }
+        if (s.voiceVolume !== undefined) {
+          voiceVolume = s.voiceVolume / 100;
+          const slider = document.getElementById('voice-volume');
+          if (slider) slider.value = s.voiceVolume;
+        }
+        if (s.musicVolume !== undefined) {
+          musicVolume = s.musicVolume / 100;
+          const slider = document.getElementById('music-volume');
+          if (slider) slider.value = s.musicVolume;
+        }
+      } catch (e) { }
+    })();
+
+    function saveSettings() {
+      try {
+        const settings = {
+          darkMode: document.body.classList.contains('dark-mode'),
+          voiceVolume: Math.round(voiceVolume * 100),
+          musicVolume: Math.round(musicVolume * 100),
+        };
+        localStorage.setItem('calm-critters-settings', JSON.stringify(settings));
+      } catch (e) { }
+    }
+
+    window.toggleDarkMode = function (enabled) {
+      if (enabled) {
+        document.body.classList.add('dark-mode');
+      } else {
+        document.body.classList.remove('dark-mode');
+      }
+      saveSettings();
+    };
+
+    window.setVoiceVolume = function (val) {
+      voiceVolume = val / 100;
+      // Apply to any currently playing ElevenLabs audio
+      activeElevenAudios.forEach(a => { try { a.volume = voiceVolume; } catch (e) { } });
+      saveSettings();
+    };
+
+    window.setMusicVolume = function (val) {
+      musicVolume = val / 100;
+      // Apply to the ambient music master gain
+      if (MeditationMusic.playing && MeditationMusic.master) {
+        try { MeditationMusic.master.gain.setValueAtTime(musicVolume, MeditationMusic.ctx.currentTime); } catch (e) { }
+      }
+      // Apply to ambient audio element
+      if (currentAudio) {
+        currentAudio.volume = musicVolume;
+      }
+      saveSettings();
+    };
+
+    window.resetAllData = function () {
+      if (confirm('This will reset all stars, streaks, feelings history, and curriculum progress. Are you sure?')) {
+        state = defaultState();
+        saveState();
+        try { localStorage.removeItem('calm-critters-settings'); } catch (e) { }
+        document.body.classList.remove('dark-mode');
+        const toggle = document.getElementById('dark-mode-toggle');
+        if (toggle) toggle.checked = false;
+        const vSlider = document.getElementById('voice-volume');
+        if (vSlider) vSlider.value = 85;
+        const mSlider = document.getElementById('music-volume');
+        if (mSlider) mSlider.value = 35;
+        voiceVolume = 0.85;
+        musicVolume = 0.35;
+        alert('All data has been reset!');
+        showScreen('home');
+      }
     };
 
     // Voices are loaded at the top of the script
